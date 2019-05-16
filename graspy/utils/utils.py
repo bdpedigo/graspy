@@ -61,7 +61,12 @@ def import_graph(graph):
 
 
 def import_edgelist(
-    path, extension="edgelist", delimiter=None, nodetype=int, return_vertices=False
+    path,
+    extension="edgelist",
+    delimiter=None,
+    nodetype=int,
+    return_vertices=False,
+    output_dict=False,
 ):
     """
     Function for reading a single or multiple edgelists. When importing multiple 
@@ -87,11 +92,14 @@ def import_edgelist(
     return_vertices : bool, default=False, optional
         Returns the union of all ind
 
+    output_dict : bool, default=False, optional
+        If `path` is a file, does nothing.
+        If True, returns dict of {'filename': np.array} key/value pairs.
+
     Returns
     -------
-    out : list of array-like, or array-like, shape (n_vertices, n_vertices)
-        If ``path`` is a directory, a list of arrays is returned. If ``path`` is a file,
-        an array is returned.
+    out : list of array-like, or array-like, shape (n_vertices, n_vertices) or dict.
+        If ``path`` is a directory, a list of arrays is returned. If ``path`` is both a directory and output_dict is True, a dictionary of {'filename': np.array} is returned. If ``path`` is a file, an array is returned.
 
     vertices : array-like, shape (n_vertices, )
         If ``return_vertices`` == True, then returns an array of all vertices that were 
@@ -140,6 +148,12 @@ def import_edgelist(
 
     if return_vertices:
         return out, vertices
+    elif output_dict and p.is_dir():
+        # TODO: make sure these are sorted properly.
+        filenames = [filepath.stem for filepath in files]
+        dict_out = dict(zip(filenames, out))
+        return dict_out
+
     else:
         return out
 
